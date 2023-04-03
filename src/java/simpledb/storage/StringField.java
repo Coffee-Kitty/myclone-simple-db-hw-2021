@@ -15,6 +15,7 @@ public class StringField implements Field {
 	private final String value;
 	private final int maxSize;
 
+
 	public String getValue() {
 		return value;
 	}

@@ -40,7 +40,7 @@ public class LogTest extends SimpleDbTestBase {
         insert.open();
         Tuple result = insert.next();
         assertEquals(SystemTestUtil.SINGLE_INT_DESCRIPTOR, result.getTupleDesc());
-        assertEquals(1, ((IntField)result.getField(0)).getValue());
+        assertEquals(Optional.of(1), ((IntField)result.getField(0)).getValue());
         assertFalse(insert.hasNext());
         insert.close();
     }

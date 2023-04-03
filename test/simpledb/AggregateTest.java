@@ -158,6 +158,8 @@ public class AggregateTest extends SimpleDbTestBase {
     TestUtil.matchAllTuples(sum, op);
   }
 
+
+
   /**
    * Unit test for Aggregate.getNext() using an avg aggregate
    */

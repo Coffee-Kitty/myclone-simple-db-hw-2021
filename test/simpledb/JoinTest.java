@@ -90,6 +90,8 @@ public class JoinTest extends SimpleDbTestBase {
     assertTrue(TestUtil.compareTuples(expected, actual));
   }
 
+
+
   /**
    * Unit test for Join.getNext() using a &gt; predicate
    */

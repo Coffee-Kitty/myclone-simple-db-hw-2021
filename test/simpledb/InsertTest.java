@@ -18,6 +18,8 @@ import simpledb.transaction.TransactionId;
  */
 public class InsertTest extends TestUtil.CreateHeapFile {
 
+
+
   private OpIterator scan1;
   private TransactionId tid;
 
@@ -44,6 +46,8 @@ public class InsertTest extends TestUtil.CreateHeapFile {
     Insert op = new Insert(tid,scan1, empty.getId());
     TupleDesc expected = Utility.getTupleDesc(1);
     TupleDesc actual = op.getTupleDesc();
+    System.out.println(expected);
+    System.out.println(actual);
     assertEquals(expected, actual);
   }
 

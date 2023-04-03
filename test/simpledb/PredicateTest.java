@@ -11,6 +11,8 @@ import junit.framework.JUnit4TestAdapter;
 
 public class PredicateTest extends SimpleDbTestBase{
 
+
+
   /**
    * Unit test for Predicate.filter()
    */

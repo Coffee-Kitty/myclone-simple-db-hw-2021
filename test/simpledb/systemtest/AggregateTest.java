@@ -108,6 +108,8 @@ public class AggregateTest extends SimpleDbTestBase {
         doAggregate(Aggregator.Op.MAX, 0);
     }
 
+
+
     @Test public void testCount() throws IOException, DbException, TransactionAbortedException {
         doAggregate(Aggregator.Op.COUNT, 0);
     }

@@ -20,6 +20,8 @@ import simpledb.transaction.TransactionId;
 
 public class JoinTest extends SimpleDbTestBase {
     private static final int COLUMNS = 2;
+
+
     public void validateJoin(int table1ColumnValue, int table1Rows, int table2ColumnValue,
             int table2Rows)
             throws IOException, DbException, TransactionAbortedException {

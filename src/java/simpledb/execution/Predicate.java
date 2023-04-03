@@ -8,6 +8,11 @@ import java.io.Serializable;
 /**
  * Predicate compares tuples to a specified Field value.
  */
+
+/**
+ * 单向比较类  例如  a > 1
+ *
+ */
 public class Predicate implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -46,7 +51,15 @@ public class Predicate implements Serializable {
         }
 
     }
-    
+
+    //a > 1
+    //a  在 tuple的fields数组中索引
+    private final int field;
+    //>
+    private final Op op;
+    //1
+    private final Field operand;
+
     /**
      * Constructor.
      * 
@@ -59,6 +72,9 @@ public class Predicate implements Serializable {
      */
     public Predicate(int field, Op op, Field operand) {
         // some code goes here
+        this.field=field;
+        this.op=op;
+        this.operand=operand;
     }
 
     /**
@@ -67,7 +83,7 @@ public class Predicate implements Serializable {
     public int getField()
     {
         // some code goes here
-        return -1;
+        return field;
     }
 
     /**
@@ -76,7 +92,7 @@ public class Predicate implements Serializable {
     public Op getOp()
     {
         // some code goes here
-        return null;
+        return op;
     }
     
     /**
@@ -85,7 +101,7 @@ public class Predicate implements Serializable {
     public Field getOperand()
     {
         // some code goes here
-        return null;
+        return operand;
     }
     
     /**
@@ -97,10 +113,12 @@ public class Predicate implements Serializable {
      * @param t
      *            The tuple to compare against
      * @return true if the comparison is true, false otherwise.
+     *  即 返回 tuple t中的 a  是否 > 1
+     *   a>1 来源于public Predicate(int field, Op op, Field operand)
      */
     public boolean filter(Tuple t) {
         // some code goes here
-        return false;
+        return t.getField(field).compare(op,operand);
     }
 
     /**
@@ -109,6 +127,8 @@ public class Predicate implements Serializable {
      */
     public String toString() {
         // some code goes here
-        return "";
+        return " field= " + field +
+                " op= " + op.toString() +
+                " operand= " + operand.toString();
     }
 }

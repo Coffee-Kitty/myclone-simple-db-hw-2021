@@ -22,6 +22,8 @@ public abstract class FilterBase extends SimpleDbTestBase {
     private static final int COLUMNS = 3;
     private static final int ROWS = 1097;
 
+
+
     /** Should apply the predicate to table. This will be executed in transaction tid. */
     protected abstract int applyPredicate(HeapFile table, TransactionId tid, Predicate predicate)
             throws DbException, TransactionAbortedException;

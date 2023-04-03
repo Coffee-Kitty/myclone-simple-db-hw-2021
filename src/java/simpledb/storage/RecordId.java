@@ -5,10 +5,21 @@ import java.io.Serializable;
 /**
  * A RecordId is a reference to a specific tuple on a specific page of a
  * specific table.
+ * 路径结构，表面该行属于PageId某个页面的tupleno行，这PageId所对应的DbPage属于DbFile某个表
  */
 public class RecordId implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
+    /**
+     *页面id
+     */
+    PageId pid;
+
+    /**
+     * 行序号
+     */
+    int tupleno;
 
     /**
      * Creates a new RecordId referring to the specified PageId and tuple
@@ -21,6 +32,8 @@ public class RecordId implements Serializable {
      */
     public RecordId(PageId pid, int tupleno) {
         // some code goes here
+        this.pid=pid;
+        this.tupleno=tupleno;
     }
 
     /**
@@ -28,7 +41,7 @@ public class RecordId implements Serializable {
      */
     public int getTupleNumber() {
         // some code goes here
-        return 0;
+        return tupleno;
     }
 
     /**
@@ -36,7 +49,7 @@ public class RecordId implements Serializable {
      */
     public PageId getPageId() {
         // some code goes here
-        return null;
+        return pid;
     }
 
     /**
@@ -48,7 +61,15 @@ public class RecordId implements Serializable {
     @Override
     public boolean equals(Object o) {
         // some code goes here
-        throw new UnsupportedOperationException("implement this");
+        //throw new UnsupportedOperationException("implement this");
+        if(!(o instanceof RecordId)){
+            return false;
+        }
+        RecordId other = (RecordId) o;
+        if(other.pid.getTableId()!=this.pid.getTableId()||other.pid.getPageNumber()!=pid.getPageNumber()||other.tupleno!=this.tupleno){
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -60,8 +81,9 @@ public class RecordId implements Serializable {
     @Override
     public int hashCode() {
         // some code goes here
-        throw new UnsupportedOperationException("implement this");
-
+        //throw new UnsupportedOperationException("implement this");
+        String hash = ""+pid.getTableId()+pid.getPageNumber()+tupleno;
+        return hash.hashCode();
     }
 
 }

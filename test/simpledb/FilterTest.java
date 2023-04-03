@@ -16,6 +16,8 @@ import simpledb.storage.Tuple;
 import simpledb.storage.TupleDesc;
 import simpledb.systemtest.SimpleDbTestBase;
 
+
+
 public class FilterTest extends SimpleDbTestBase {
 
   final int testWidth = 3;

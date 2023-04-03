@@ -15,6 +15,8 @@ import junit.framework.JUnit4TestAdapter;
 
 public class TupleDescTest extends SimpleDbTestBase {
 
+
+
     /**
      * Unit test for TupleDesc.combine()
      */

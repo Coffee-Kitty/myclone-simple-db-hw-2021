@@ -20,6 +20,7 @@ import simpledb.transaction.TransactionId;
 public class DeleteTest extends FilterBase {
     List<List<Integer>> expectedTuples = null;
 
+
     @Override
     protected int applyPredicate(HeapFile table, TransactionId tid, Predicate predicate)
             throws DbException, TransactionAbortedException {

@@ -114,6 +114,8 @@ public class IntegerAggregatorTest extends SimpleDbTestBase {
     }
   }
 
+
+
   /**
    * Test IntegerAggregator.mergeTupleIntoGroup() and iterator() over an avg
    */

@@ -25,7 +25,9 @@ public class CatalogTest extends SimpleDbTestBase {
     private static final int id1 = r.nextInt();
     private static final int id2 = r.nextInt();
 	private String nameThisTestRun;
-    
+
+
+
     @Before public void addTables() {
         Database.getCatalog().clear();
 		nameThisTestRun = SystemTestUtil.getUUID();

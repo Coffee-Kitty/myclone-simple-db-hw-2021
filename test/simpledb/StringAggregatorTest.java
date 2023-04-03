@@ -57,6 +57,8 @@ public class StringAggregatorTest extends SimpleDbTestBase {
     }
   }
 
+
+
   /**
    * Test StringAggregator.iterator() for OpIterator behaviour
    */

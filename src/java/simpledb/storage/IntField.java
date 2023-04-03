@@ -14,7 +14,8 @@ public class IntField implements Field {
 
     private final int value;
 
-    public int getValue() {
+
+    public Integer getValue() {
         return value;
     }
 
@@ -82,4 +83,6 @@ public class IntField implements Field {
     public Type getType() {
         return Type.INT_TYPE;
     }
+
+
 }

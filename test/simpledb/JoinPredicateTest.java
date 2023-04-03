@@ -13,6 +13,7 @@ import junit.framework.JUnit4TestAdapter;
 public class JoinPredicateTest extends SimpleDbTestBase {
 
   /**
+   *
    * Unit test for JoinPredicate.filter()
    */
   @Test public void filterVaryingVals() {

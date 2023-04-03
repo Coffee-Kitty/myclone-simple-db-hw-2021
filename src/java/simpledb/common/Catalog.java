@@ -18,17 +18,73 @@ import java.util.concurrent.ConcurrentHashMap;
  * For now, this is a stub catalog that must be populated with tables by a
  * user program before it can be used -- eventually, this should be converted
  * to a catalog that reads a catalog table from disk.
- * 
  * @Threadsafe
+ */
+
+/**
+ * 存储所有表记录
  */
 public class Catalog {
 
+    /**
+     * 然后我们再来说说为什么又将内部类设计为静态内部类与内部类：首先来看一下静态内部类的特点：如 昭言 用户所述那样，我是静态内部类，只不过是想借你的外壳用一下。
+     * 本身来说，我和你没有什么“强依赖”上的关系。没有你，我也可以创建实例。
+     * 那么，在设计内部类的时候我们就可以做出权衡：如果我内部类与你外部类关系不紧密，耦合程度不高，不需要访问外部类的所有属性或方法，那么我就设计成静态内部类。
+     * 而且，由于静态内部类与外部类并不会保存相互之间的引用，因此在一定程度上，还会节省那么一点内存资源，何乐而不为呢~~
+     *
+     * 既然上面已经说了什么时候应该用静态内部类，那么如果你的需求不符合静态内部类所提供的一切好处，你就应该考虑使用内部类了。
+     * 最大的特点就是：你在内部类中需要访问有关外部类的所有属性及方法，我知晓你的一切... ...
+     *
+     */
+    /**
+     * 表类
+     */
+    private static class Table{
+        /**
+         * 对应文件
+         */
+        DbFile dbFile;
+        /**
+         * 表名称
+         */
+        String name;
+        /**
+         * 表主键的名称
+         */
+        String pkeyField;
+
+        public Table(DbFile dbFile,String name,String pkeyField){
+            this.dbFile=dbFile;
+            this.name=name;
+            this.pkeyField=pkeyField;
+        }
+
+        @Override
+        public String toString(){
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("DbFile: ").append(dbFile)
+                    .append("Name: ").append(name).
+                    append("PkeyField: ").append(pkeyField);
+            return stringBuilder.toString();
+        }
+    }
+
+    /**
+     * 管理所有的表文件的哈希表
+     * tableId -->对应的table
+     * 用于存储 tableId 和 表记录的映射
+     *
+     * 注意表id 等价于 文件id
+     * 由文件绝对路径生成  一张表对应一个文件
+     */
+    ConcurrentHashMap<Integer,Table> hashTable;
     /**
      * Constructor.
      * Creates a new, empty catalog.
      */
     public Catalog() {
         // some code goes here
+        hashTable=new ConcurrentHashMap<>();
     }
 
     /**
@@ -42,6 +98,7 @@ public class Catalog {
      */
     public void addTable(DbFile file, String name, String pkeyField) {
         // some code goes here
+        hashTable.put(file.getId(),new Table(file,name,pkeyField));
     }
 
     public void addTable(DbFile file, String name) {
@@ -65,7 +122,18 @@ public class Catalog {
      */
     public int getTableId(String name) throws NoSuchElementException {
         // some code goes here
-        return 0;
+        // 遍历
+        Integer res=null;
+        for(Integer key:hashTable.keySet()){
+            if(hashTable.get(key).name.equals(name)){
+                res=key;
+                break;
+            }
+        }
+        if(res != null){
+            return res;
+        }
+        throw new NoSuchElementException("not found id for table " + name);
     }
 
     /**
@@ -76,7 +144,11 @@ public class Catalog {
      */
     public TupleDesc getTupleDesc(int tableid) throws NoSuchElementException {
         // some code goes here
-        return null;
+        Table table = hashTable.getOrDefault(tableid, null);
+        if(table!=null){
+            return table.dbFile.getTupleDesc();
+        }
+        throw new NoSuchElementException("not found TupleDesc for table:"+tableid);
     }
 
     /**
@@ -87,27 +159,40 @@ public class Catalog {
      */
     public DbFile getDatabaseFile(int tableid) throws NoSuchElementException {
         // some code goes here
-        return null;
+        Table table = hashTable.getOrDefault(tableid, null);
+        if(table!=null){
+            return table.dbFile;
+        }
+        throw new NoSuchElementException("not found DatabaseFile for table:"+tableid);
     }
 
     public String getPrimaryKey(int tableid) {
         // some code goes here
-        return null;
+        Table table = hashTable.getOrDefault(tableid, null);
+        if(table!=null){
+            return table.pkeyField;
+        }
+        throw new NoSuchElementException("not found PrimaryKey for table:"+tableid);
     }
 
     public Iterator<Integer> tableIdIterator() {
         // some code goes here
-        return null;
+        return hashTable.keySet().iterator();
     }
 
     public String getTableName(int id) {
         // some code goes here
-        return null;
+        Table table = hashTable.getOrDefault(id, null);
+        if(table!=null){
+            return table.name;
+        }
+        throw new NoSuchElementException("not found name for table:"+id);
     }
     
     /** Delete all tables from the catalog */
     public void clear() {
         // some code goes here
+        hashTable.clear();
     }
     
     /**

@@ -42,7 +42,7 @@ public class InsertTest extends SimpleDbTestBase {
             assertFalse(hasResult);
             hasResult = true;
             assertEquals(SystemTestUtil.SINGLE_INT_DESCRIPTOR, tup.getTupleDesc());
-            assertEquals(sourceRows, ((IntField) tup.getField(0)).getValue());
+            assertEquals((Integer) sourceRows, ((IntField) tup.getField(0)).getValue());
         }
         assertTrue(hasResult);
         insOp.close();

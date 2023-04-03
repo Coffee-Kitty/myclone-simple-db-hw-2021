@@ -11,6 +11,8 @@ import simpledb.systemtest.SimpleDbTestBase;
 
 public class TupleTest extends SimpleDbTestBase {
 
+
+
     /**
      * Unit test for Tuple.getField() and Tuple.setField()
      */
@@ -66,4 +68,6 @@ public class TupleTest extends SimpleDbTestBase {
         return new JUnit4TestAdapter(TupleTest.class);
     }
 }
+
+
 

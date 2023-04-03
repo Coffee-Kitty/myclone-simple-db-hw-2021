@@ -132,6 +132,9 @@ public class TestUtil {
         // TODO(ghuo): this n^2 set comparison is kind of dumb, but we haven't
         // implemented hashCode or equals for tuples.
         boolean matched = false;
+
+        int count=0;
+
         while (expected.hasNext()) {
             Tuple expectedTup = expected.next();
             matched = false;
@@ -141,6 +144,8 @@ public class TestUtil {
                 Tuple next = actual.next();
                 if (compareTuples(expectedTup, next)) {
                     matched = true;
+                    count++;
+                    System.out.println(next);
                     break;
                 }
             }
