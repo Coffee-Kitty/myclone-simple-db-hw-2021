@@ -130,7 +130,9 @@ public class JoinOptimizer {
             // HINT: You may need to use the variable "j" if you implemented
             // a join algorithm that's more complicated than a basic
             // nested-loops join.
-            return -1.0;
+            double v = cost1 + card1*cost2 + card1*card2;
+            //正常来讲  是card1*card2 然而要获取card1和card2需要扫描全表nestedloop 所以还要加cost
+            return v;
         }
     }
 
@@ -169,6 +171,19 @@ public class JoinOptimizer {
     /**
      * Estimate the join cardinality of two tables.
      * */
+    /**
+     * 首先我们要明确，这个函数要返回什么，返回的就是，如果join成功话后将形成的Tuple个数。那么这就要分几种情况。
+     *
+     * 当Predicate.Op 是 EQUALS时：
+     *
+     * 当表一是join的字段是主键，对应表二的字段也是主键的话，就返回card数大的那个值。
+     * 当表一是join的字段是主键，对应表二的字段不是主键的话，就返回card2。
+     * 当表一是join的字段不是主键，对应表二的字段是主键的话，就返回card1。
+     * 当Predicate.Op 不是 EQUALS时：
+     *
+     * 那么官方文档中给了一个公式，就是返回 0.3 * card1 *card2 这个公式估计是经过论证的吧。
+     * 最后一种情况，当card结果小于等于0时，直接返回1。
+     */
     public static int estimateTableJoinCardinality(Predicate.Op joinOp,
                                                    String table1Alias, String table2Alias, String field1PureName,
                                                    String field2PureName, int card1, int card2, boolean t1pkey,
@@ -176,6 +191,20 @@ public class JoinOptimizer {
                                                    Map<String, Integer> tableAliasToId) {
         int card = 1;
         // some code goes here
+        if(joinOp.equals(Predicate.Op.EQUALS)){
+            if(t1pkey&&t2pkey){
+                card= Math.max(card1, card2);
+            }
+            else if(t1pkey){
+                card=card2;
+            }else if(t2pkey){
+                card=card1;
+            }
+        }else{
+           card= (int) (0.3*card1*card2);
+        }
+
+
         return card <= 0 ? 1 : card;
     }
 
@@ -238,7 +267,35 @@ public class JoinOptimizer {
 
         // some code goes here
         //Replace the following
-        return joins;
+        int numJoinNodes = joins.size();//join的表的数目
+
+        //获得计划缓存区  用于存储最好的计划
+        PlanCache pc = new PlanCache();
+
+
+        Set<LogicalJoinNode> wholeSet = null;
+        for(int i = 1; i <= numJoinNodes; i++) {
+            Set<Set<LogicalJoinNode>> setOfSubset = this.enumerateSubsets(this.joins, i);//枚举给定大小的join子集
+
+            for(Set<LogicalJoinNode> s : setOfSubset) {
+                if(s.size() == numJoinNodes)
+                    wholeSet = s;
+                Double bestCostSofar = Double.MAX_VALUE;
+                CostCard bestPlan = new CostCard(); // 该类用于保存plan，cost，card
+                for (LogicalJoinNode toRemove : s) {
+                    CostCard plan = computeCostAndCardOfSubplan(stats, filterSelectivities, toRemove, s, bestCostSofar, pc);
+                    if (plan != null) {
+                        bestCostSofar = plan.cost;
+                        bestPlan = plan;
+                    }
+                }
+                if (bestPlan.plan != null) {
+                    pc.addPlan(s, bestPlan.cost, bestPlan.card, bestPlan.plan);
+                }
+            }
+
+        }
+        return pc.getOrder(wholeSet);
     }
 
     // ===================== Private Methods =================================

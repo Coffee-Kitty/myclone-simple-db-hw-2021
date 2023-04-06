@@ -6,6 +6,11 @@ import simpledb.execution.Predicate;
  * A class to represent a fixed-width histogram over a single String-based
  * field.
  */
+
+/**
+ * 对于StringField我们维护StringHistogram
+ * 然而StringHistogram的本质是把string转化成int  然后内部维护了IntHistogram
+ */
 public class StringHistogram {
     final IntHistogram hist;
 

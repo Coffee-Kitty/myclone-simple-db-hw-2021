@@ -398,5 +398,8 @@ public class HeapPage implements Page {
         return res.iterator();
     }
 
+    public Tuple[] getTuples() {
+        return tuples;
+    }
 }
 

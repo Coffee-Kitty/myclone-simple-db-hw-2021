@@ -48,7 +48,8 @@ public class IntHistogramTest {
 		// Also, there are more of them than there are bins.
 		for (int c = -60; c <= -10; c++) {
 			h.addValue(c);
-			h.estimateSelectivity(Op.EQUALS, c);
+			double v = h.estimateSelectivity(Op.EQUALS, c);
+//			System.out.println(v);
 		}
 		
 		// Even with just 10 bins and 50 values,
@@ -58,6 +59,8 @@ public class IntHistogramTest {
 		// And it really shouldn't be 0.
 		// Though, it could easily be as low as 0.02, seeing as that's
 		// the fraction of elements that actually are equal to -33.
+		double v = h.estimateSelectivity(Op.EQUALS, -33);
+		System.out.println(v);
 		Assert.assertTrue(h.estimateSelectivity(Op.EQUALS, -33) > 0.001);
 	}
 	
@@ -172,6 +175,8 @@ public class IntHistogramTest {
 		h.addValue(3);
 		
 		// Be conservative in case of alternate implementations
+		double v = h.estimateSelectivity(Op.NOT_EQUALS, 3);
+		double v1 = h.estimateSelectivity(Op.NOT_EQUALS, 8);
 		Assert.assertTrue(h.estimateSelectivity(Op.NOT_EQUALS, 3) < 0.001);
 		Assert.assertTrue(h.estimateSelectivity(Op.NOT_EQUALS, 8) > 0.01);
 	}
