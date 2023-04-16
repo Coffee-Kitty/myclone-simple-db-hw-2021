@@ -49,9 +49,17 @@ public class HeapPageId implements PageId {
     public int hashCode() {
         // some code goes here
         //throw new UnsupportedOperationException("implement this");
-        String hash = ""+tableId+pgNo;
-        return hash.hashCode();
+        String s = ""+tableId+pgNo;
+        int hash=s.hashCode();
+        return hash;
     }
+
+//    public static void main(String[] args) {
+//        String a="123456"+789;
+//        String b="123456"+789;
+//        System.out.println(a.hashCode());
+//        System.out.println(b.hashCode());
+//    }
 
     /**
      * Compares one PageId to another.

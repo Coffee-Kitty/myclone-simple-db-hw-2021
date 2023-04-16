@@ -17,7 +17,7 @@ import simpledb.execution.SeqScan;
 import simpledb.storage.HeapFile;
 import simpledb.transaction.TransactionAbortedException;
 import simpledb.transaction.TransactionId;
-
+//已通过
 public class JoinTest extends SimpleDbTestBase {
     private static final int COLUMNS = 2;
 

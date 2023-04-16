@@ -17,7 +17,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import junit.framework.JUnit4TestAdapter;
-
+//已通过
 public class HeapPageReadTest extends SimpleDbTestBase {
     private HeapPageId pid;
 

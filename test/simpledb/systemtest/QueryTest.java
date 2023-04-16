@@ -17,7 +17,7 @@ import simpledb.optimizer.TableStats;
 import simpledb.transaction.Transaction;
 import simpledb.transaction.TransactionAbortedException;
 import simpledb.common.Utility;
-
+//已通过
 public class QueryTest {
 	
 	/**

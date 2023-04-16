@@ -16,7 +16,7 @@ import junit.framework.JUnit4TestAdapter;
 import simpledb.transaction.TransactionId;
 
 
-
+//已通过
 public class HeapFileReadTest extends SimpleDbTestBase {
     private HeapFile hf;
     private TransactionId tid;

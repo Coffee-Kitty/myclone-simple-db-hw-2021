@@ -17,7 +17,7 @@ import simpledb.storage.TupleDesc;
 import simpledb.systemtest.SimpleDbTestBase;
 
 
-
+//已通过
 public class FilterTest extends SimpleDbTestBase {
 
   final int testWidth = 3;

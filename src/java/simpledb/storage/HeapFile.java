@@ -58,6 +58,7 @@ public class HeapFile implements DbFile {
         private Iterator<Tuple> getPageTuple(int pageNumber) throws TransactionAbortedException, DbException {
             //首先判断页码是否超出文件范围
             if(pageNumber>=0 && pageNumber<heapFile.numPages()){
+
                 HeapPageId heapPageId = new HeapPageId(heapFile.getId(), pageNumber);
                 // 从缓存池中查询相应的页面 读权限
                 HeapPage page = (HeapPage)Database.getBufferPool().getPage(tid, heapPageId, Permissions.READ_ONLY);
@@ -160,7 +161,8 @@ public class HeapFile implements DbFile {
     public int getId() {
         // some code goes here
         //throw new UnsupportedOperationException("implement this");
-        return file.getAbsoluteFile().hashCode();
+        int id=file.getAbsoluteFile().hashCode();
+        return id;
     }
 
     /**
@@ -261,14 +263,28 @@ public class HeapFile implements DbFile {
                 page.markDirty(true,tid);
                 list.add(page);
                 return list;
+            }else{
+                //在插入时 如果没有空槽
+                //要进行新页的创建(申请新页的锁)  则在此页上申请的锁应该 释放
+                Database.getBufferPool().unsafeReleasePage(tid,page.getId());
             }
         }
 
         //如果 没有页有空槽 则创建新页
+        /**
+         * 下方代码出现严重问题
+         * 事务没有提交  怎么能直接把插入好的页面给出呢？
+         * 应该先创建页面  在缓存中读取到页面后才嫩插入元组
+         */
         HeapPage page = new HeapPage(new HeapPageId(tableid, numPages()), HeapPage.createEmptyPageData());
-        page.insertTuple(t);
         writePage(page);
-        list.add(page);
+
+        //在此处从缓存中读取页面
+        HeapPage newpage=(HeapPage) Database.getBufferPool().getPage(tid, page.pid, Permissions.READ_WRITE);
+
+        newpage.insertTuple(t);
+        newpage.markDirty(true,tid);
+        list.add(newpage);
         return list;
         // not necessary for lab1
     }

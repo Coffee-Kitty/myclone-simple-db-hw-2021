@@ -18,7 +18,7 @@ import simpledb.storage.IntField;
 import simpledb.systemtest.SimpleDbTestBase;
 import simpledb.systemtest.SystemTestUtil;
 import simpledb.transaction.TransactionAbortedException;
-
+//已通过
 public class TableStatsTest extends SimpleDbTestBase {
 	public static final int IO_COST = 71;
 	

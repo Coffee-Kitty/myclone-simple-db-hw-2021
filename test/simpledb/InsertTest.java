@@ -11,7 +11,7 @@ import simpledb.execution.Insert;
 import simpledb.execution.OpIterator;
 import simpledb.storage.TupleDesc;
 import simpledb.transaction.TransactionId;
-
+//已通过
 /**
  * We reserve more heavy-duty insertion testing for HeapFile and HeapPage.
  * This suite is superficial.

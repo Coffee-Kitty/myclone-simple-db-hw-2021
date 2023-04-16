@@ -16,7 +16,7 @@ import simpledb.storage.DbFile;
 import simpledb.storage.HeapFile;
 import simpledb.transaction.TransactionAbortedException;
 import simpledb.transaction.TransactionId;
-
+//已通过
 public class AggregateTest extends SimpleDbTestBase {
     public void validateAggregate(DbFile table, Aggregator.Op operation, int aggregateColumn, int groupColumn, List<List<Integer>> expectedResult)
             throws DbException, TransactionAbortedException {
@@ -27,6 +27,8 @@ public class AggregateTest extends SimpleDbTestBase {
         SystemTestUtil.matchTuples(ag, expectedResult);
         Database.getBufferPool().transactionComplete(tid);
     }
+
+
 
     private int computeAggregate(List<Integer> values, Aggregator.Op operation) {
         if (operation == Aggregator.Op.COUNT) return values.size();

@@ -8,7 +8,7 @@ import org.junit.Test;
 import simpledb.common.Utility;
 import simpledb.storage.*;
 import simpledb.systemtest.SimpleDbTestBase;
-
+//已通过
 public class TupleTest extends SimpleDbTestBase {
 
 

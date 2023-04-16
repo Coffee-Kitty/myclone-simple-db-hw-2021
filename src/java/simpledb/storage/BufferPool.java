@@ -3,11 +3,14 @@ package simpledb.storage;
 import simpledb.common.Database;
 import simpledb.common.Permissions;
 import simpledb.common.DbException;
+import simpledb.execution.Aggregator;
+import simpledb.transaction.Transaction;
 import simpledb.transaction.TransactionAbortedException;
 import simpledb.transaction.TransactionId;
 
 import java.io.*;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -60,6 +63,10 @@ public class BufferPool {
     //重构了
     private final  LRUCache<Integer,Page> pageStore;
     /**
+     * 缓冲区的基于页的锁管理
+     */
+    private LockManager lockManager;
+    /**
      * Creates a BufferPool that caches up to numPages pages.
      *
      * @param numPages maximum number of pages in this buffer pool.
@@ -68,6 +75,7 @@ public class BufferPool {
         // some code goes here
         this.pageNums=numPages;
         this.pageStore=new LRUCache<>(numPages);
+        lockManager=new LockManager();
     }
     
     public static int getPageSize() {
@@ -101,29 +109,34 @@ public class BufferPool {
      */
     public  Page getPage(TransactionId tid, PageId pid, Permissions perm)
         throws TransactionAbortedException, DbException {
-        // some code goes here
-//        //查看缓冲池中是否有
-//        Page page = pageStore.getOrDefault(pid.hashCode(), null);
-//
-//        if(page==null){//如果不在，则读取
-//            DbFile dbFile = Database.getCatalog().getDatabaseFile(pid.getTableId());
-//            page = dbFile.readPage(pid);
-//            // 是否超过大小
-//            if(pageStore.size() >= pageNums){
-//                // 淘汰 (后面的 Exercise 书写)
-//                throw new DbException("页面已满");
-//            }
-//            // 放入缓存
-//            pageStore.put(pid.hashCode(), page);
-//        }
-//        return page;
+        //首先只有获取锁 才能跳出死循环
+        //死循环有时间限制
+        boolean isAcquire = lockManager.acquireLock(pid,tid,perm);
+        long startTime = System.currentTimeMillis();
+        while (!isAcquire){
+            long now = System.currentTimeMillis();
+            if(now-startTime > 500){
+                throw new TransactionAbortedException();
+            }
+            isAcquire = lockManager.acquireLock(pid,tid,perm);
+        }
         //1.从LRU缓存中得到
         Page page = pageStore.get(pid.hashCode());
         if(page==null){
             //如果不存在 从磁盘中取
             page = Database.getCatalog().getDatabaseFile(pid.getTableId()).readPage(pid);
-            //取完放到LRU缓存中  LRU缓存自动维护大小 淘汰页面等
-            pageStore.put(pid.hashCode(),page);
+            if (page!=null){
+
+                //取完放到LRU缓存中
+                int hashCode = page.getId().hashCode();
+                if(!pageStore.getCache().containsKey(hashCode)&&pageStore.getCache().size()>=pageNums){
+                    evictPage();
+                }
+                pageStore.put(hashCode,page);
+
+            }else{
+                throw new DbException("database have not the page");
+            }
         }
         return page;
     }
@@ -140,6 +153,7 @@ public class BufferPool {
     public  void unsafeReleasePage(TransactionId tid, PageId pid) {
         // some code goes here
         // not necessary for lab1|lab2
+        lockManager.releaseLock(tid,pid);
     }
 
     /**
@@ -147,16 +161,20 @@ public class BufferPool {
      *
      * @param tid the ID of the transaction requesting the unlock
      */
+
     public void transactionComplete(TransactionId tid) {
         // some code goes here
         // not necessary for lab1|lab2
+        transactionComplete(tid,true);
+
     }
+
 
     /** Return true if the specified transaction has a lock on the specified page */
     public boolean holdsLock(TransactionId tid, PageId p) {
         // some code goes here
         // not necessary for lab1|lab2
-        return false;
+        return lockManager.holdsLock(p, tid);
     }
 
     /**
@@ -166,9 +184,39 @@ public class BufferPool {
      * @param tid the ID of the transaction requesting the unlock
      * @param commit a flag indicating whether we should commit or abort
      */
+    //事务提交  如果成功 刷盘
+    //         如果失败 回滚
     public void transactionComplete(TransactionId tid, boolean commit) {
         // some code goes here
         // not necessary for lab1|lab2
+        if (commit){
+            try {
+                flushPages(tid);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }else {
+            //回滚
+            rollbackTransaction(tid);
+        }
+        //完成事务或者中止事务后释放所有的锁
+          lockManager.releaseAllLock(tid);
+
+    }
+    //回滚页面
+    private  void rollbackTransaction(TransactionId tid){
+            List<Page> allV = pageStore.getAllV();
+            Iterator<Page> iterator = allV.iterator();
+            while (iterator.hasNext()){
+                Page next = iterator.next();
+                if(next.isDirty()!=null&&next.isDirty().equals(tid)){
+                    //如果事务id相同
+                    //则重新读取页到缓存区即可
+                    DbFile databaseFile = Database.getCatalog().getDatabaseFile(next.getId().getTableId());
+                    Page page = databaseFile.readPage(next.getId());
+                    pageStore.put(next.getId().hashCode(),page);//put后需调整到队列头
+                }
+            }
     }
 
     /**
@@ -188,33 +236,18 @@ public class BufferPool {
      */
     public void insertTuple(TransactionId tid, int tableId, Tuple t)
         throws DbException, IOException, TransactionAbortedException {
-        // some code goes here
-        // not necessary for lab1
-//        // 注意在heapfile中仍是通过 bufferpool得到对应的页 然后去修改的
-//        //也就是说未更新到磁盘
-//        DbFile dbFile = Database.getCatalog().getDatabaseFile(tableId);
-//        List<Page> pages = dbFile.insertTuple(tid, t);
-//        //然后用脏页替换pageStore中现有页
-//        //PageId pageId = t.getRecordId().getPageId();
-//        for(Page page: pages){
-//            page.markDirty(true,tid);
-//            //如果缓冲区已满  则执行丢弃策略
-//            if(pageNums >= BufferPool.DEFAULT_PAGES){
-//                evictPage();
-//            }
-//            pageStore.put( page.getId().hashCode() ,page);//因为pagestrore 是 页id的hashcode 与 page的映射
-//        }
         //1.调用DBFile DBFile如果发现LRU缓存中有   则调用Page 在Page上插入，并返回插入的脏页
         //                   否则其直接写，  那么需要将新页添加到缓存
         DbFile dbFile = Database.getCatalog().getDatabaseFile(tableId);
         List<Page> pages = dbFile.insertTuple(tid, t);
-        //2.无论是返回的脏页还是新页  都需put到LRU缓存  LRU缓存会自动提到队列头
+        //2.无论是返回的脏页还是新页  都需put到LRU缓存
         for(Page page:pages){
-            //新页需要加入缓存 那么是否需要标脏呢？
-            //尽管由于我们创建新页时 先插入元组 再写入磁盘 不属于脏页
-            //但新页 也属于时间前后比照下的  脏页
-            page.markDirty(true,tid);  //二次标脏无所谓吧
-            pageStore.put(page.getId().hashCode(),page);//脏页还需要加入缓存码？
+
+            int hashCode = page.getId().hashCode();
+            if(!pageStore.getCache().containsKey(hashCode)&&pageStore.getCache().size()>=pageNums){
+                evictPage();
+            }
+            pageStore.put(hashCode,page);
         }
 
     }
@@ -234,23 +267,18 @@ public class BufferPool {
      */
     public  void deleteTuple(TransactionId tid, Tuple t)
         throws DbException, IOException, TransactionAbortedException {
-        // some code goes here
-        // not necessary for lab1
-
-//        DbFile dbFile = Database.getCatalog().getDatabaseFile(t.getRecordId().getPageId().getTableId());
-//        List<Page> pages = dbFile.deleteTuple(tid, t);
-//        for (int i = 0; i < pages.size(); i++) {
-//            pages.get(i).markDirty(true, tid);
-//        }
         //1.还是先调用DBFile  DBFile从缓存中拿页Page 如果有则删除元组并返回已经标记了的脏页
         //                                       否则LRU缓存 pageStore会调用DBFile从磁盘读页 然后加入LRU缓存   然后再删除元组并返回脏页
         DbFile dbFile = Database.getCatalog().getDatabaseFile(t.getRecordId().getPageId().getTableId());
         List<Page> pages = dbFile.deleteTuple(tid, t);
         //？？？ 由于对象都是引用  那么pageStore已经全是脏页了  被修改过了
-        //那也 二次标脏  二次put？
         for(Page page:pages){
-            page.markDirty(true,tid);
-            pageStore.put(page.getId().hashCode(),page);
+//            page.markDirty(true,tid);
+            int hashCode = page.getId().hashCode();
+            if(!pageStore.getCache().containsKey(hashCode)&&pageStore.getCache().size()>=pageNums){
+                evictPage();
+            }
+            pageStore.put(hashCode,page);
         }
 
 
@@ -261,9 +289,8 @@ public class BufferPool {
      * NB: Be careful using this routine -- it writes dirty data to disk so will
      *     break simpledb if running in NO STEAL mode.
      */
-    public synchronized void flushAllPages() throws IOException {
-        // some code goes here
-        // not necessary for lab1
+   // public synchronized void flushAllPages() throws IOException {
+    public  void flushAllPages() throws IOException {
         for(Page page:pageStore.getAllV()){
             PageId id = page.getId();
             flushPage(id);//flushPage会自动判断脏页
@@ -279,18 +306,15 @@ public class BufferPool {
         are removed from the cache so they can be reused safely
     */
     public synchronized void discardPage(PageId pid) {
-        // some code goes here
-        // not necessary for lab1
-       pageStore.removeK(pid.hashCode());
+        pageStore.removeK(pid.hashCode());
     }
 
     /**
      * Flushes a certain page to disk
      * @param pid an ID indicating the page to flush
      */
+    //将页刷新到磁盘
     private synchronized  void flushPage(PageId pid) throws IOException {
-        // some code goes here
-        // not necessary for lab1
         Page page = pageStore.get(pid.hashCode());
         //磁盘不存在 此页或则 此页不为脏页无需写入
         if(page==null||page.isDirty()==null){
@@ -304,9 +328,13 @@ public class BufferPool {
 
     /** Write all pages of the specified transaction to disk.
      */
-    public synchronized  void flushPages(TransactionId tid) throws IOException {
-        // some code goes here
-        // not necessary for lab1|lab2
+    //事务提交后成功刷盘
+    public  synchronized void flushPages(TransactionId tid) throws IOException {
+        for(Page page:pageStore.getAllV()){
+            if(page.isDirty()==tid){
+                flushPage(page.getId());
+            }
+        }
 
     }
 
@@ -315,28 +343,24 @@ public class BufferPool {
      * Flushes the page to disk to ensure dirty pages are updated on disk.
      */
     private synchronized  void evictPage() throws DbException {
-        // some code goes here
-        // not necessary for lab1
-//        // 就简单挑选第一张被修改的脏页删除吧
-//        Set<Map.Entry<Integer, Page>> entries = pageStore.entrySet();
-//        for(Map.Entry<Integer, Page> entry:entries){
-//            TransactionId dirty = entry.getValue().isDirty();
-//            if(dirty!=null){
-//                //先刷新脏页到磁盘
-//                try {
-//                    flushPage(entry.getValue().getId());
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//                //再除去
-//                pageStore.remove(entry.getKey(),entry.getValue());
-//            }
-//        }
-
-        //1.简单来讲  我们从LRU缓存中获取 队尾V
-        //然后调用discardPage即可
-        Page tailV = pageStore.getTailV();
-        discardPage(tailV.getId());
+        //有了事务后   只有事务提交了 并且是脏页 才能discard
+        List<Page> allV = pageStore.getAllV();
+        //获取逆序的LRU
+        for (int i = allV.size()-1; i >=0 ; i--) {
+            TransactionId dirty = allV.get(i).isDirty();//返回是否为脏页 如果为脏页返回持有事务id 否则返回null
+            if(dirty==null){
+                PageId id = allV.get(i).getId();
+                try {
+                    flushPage(id);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                pageStore.removeK(id.hashCode());
+                return;
+            }
+        }
+        //查看是否真的evict了
+        throw new DbException("All Page Are Dirty Page");
 
     }
 

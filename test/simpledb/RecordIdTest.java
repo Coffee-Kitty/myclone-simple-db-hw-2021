@@ -11,7 +11,7 @@ import simpledb.systemtest.SimpleDbTestBase;
 
 import static org.junit.Assert.*;
 
-
+//已通过
 
 public class RecordIdTest extends SimpleDbTestBase {
 

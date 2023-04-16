@@ -21,7 +21,7 @@ import simpledb.transaction.TransactionId;
 
 import static org.junit.Assert.*;
 
-
+//已通过
 
 public class HeapPageWriteTest extends SimpleDbTestBase {
 

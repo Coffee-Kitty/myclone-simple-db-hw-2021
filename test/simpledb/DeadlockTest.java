@@ -15,7 +15,7 @@ import simpledb.storage.BufferPool;
 import simpledb.storage.HeapPageId;
 import simpledb.storage.PageId;
 import simpledb.transaction.TransactionId;
-
+//已通过
 public class DeadlockTest extends TestUtil.CreateHeapFile {
   private PageId p0;
     private PageId p1;
@@ -128,6 +128,8 @@ public class DeadlockTest extends TestUtil.CreateHeapFile {
    * t1 acquires p0.write; t2 acquires p1.write; t1 attempts p1.write; t2
    * attempts p0.write.
    */
+
+
   @Test public void testWriteWriteDeadlock() throws Exception {
     System.out.println("testWriteWriteDeadlock constructing deadlock:");
 

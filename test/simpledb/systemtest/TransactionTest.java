@@ -53,6 +53,7 @@ public class TransactionTest extends SimpleDbTestBase {
                 fail("Timed out waiting for transaction to complete");
             }
             try {
+                //调用join的线程进行等待  当join的线程执行完毕后接着执行
                 tester.join(timeout);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
@@ -74,7 +75,7 @@ public class TransactionTest extends SimpleDbTestBase {
         DbFileIterator it = table.iterator(tid);
         it.open();
         Tuple tup = it.next();
-        assertEquals(java.util.Optional.of(threads), ((IntField) tup.getField(0)).getValue());
+        assertEquals(java.util.Optional.of(threads).get(), ((IntField) tup.getField(0)).getValue());
         it.close();
         Database.getBufferPool().transactionComplete(tid);
         Database.getBufferPool().flushAllPages();
@@ -214,17 +215,17 @@ public class TransactionTest extends SimpleDbTestBase {
         }
     }
     
-    @Test public void testSingleThread()
+    @Test public void testSingleThread()//200毫秒
             throws IOException, DbException, TransactionAbortedException {
         validateTransactions(1);
     }
 
-    @Test public void testTwoThreads()
+    @Test public void testTwoThreads()//54秒
             throws IOException, DbException, TransactionAbortedException {
         validateTransactions(2);
     }
 
-    @Test public void testFiveThreads()
+    @Test public void testFiveThreads()//2分22秒
             throws IOException, DbException, TransactionAbortedException {
         validateTransactions(5);
     }

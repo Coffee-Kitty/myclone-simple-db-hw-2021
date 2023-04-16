@@ -15,7 +15,7 @@ import simpledb.execution.Aggregator;
 import simpledb.execution.OpIterator;
 import simpledb.storage.TupleDesc;
 import simpledb.systemtest.SimpleDbTestBase;
-
+//已通过
 public class AggregateTest extends SimpleDbTestBase {
 
   final int width1 = 2;

@@ -16,6 +16,7 @@ import simpledb.storage.*;
 import simpledb.transaction.Transaction;
 import simpledb.transaction.TransactionAbortedException;
 
+//已通过
 public class AbortEvictionTest extends SimpleDbTestBase {
     // Note: This is a direct copy of the EvictTest method,
     // but the autograder won't necessarily have EvictTest when it runs
@@ -47,6 +48,7 @@ public class AbortEvictionTest extends SimpleDbTestBase {
         SeqScan ss = new SeqScan(t.getId(), f.getId(), "");
         boolean found = false;
         ss.open();
+        //int count=0;
         while (ss.hasNext()) {
             Tuple v = ss.next();
             int v0 = ((IntField)v.getField(0)).getValue();

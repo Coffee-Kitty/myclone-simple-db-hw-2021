@@ -20,7 +20,7 @@ import junit.framework.JUnit4TestAdapter;
 import simpledb.transaction.TransactionId;
 
 import static org.junit.Assert.*;
-
+//已通过
 public class BTreeRootPtrPageTest extends SimpleDbTestBase {
 	private BTreePageId pid;
 

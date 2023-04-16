@@ -12,7 +12,7 @@ import simpledb.systemtest.SimpleDbTestBase;
 import static org.junit.Assert.*;
 import org.junit.Assert;
 import junit.framework.JUnit4TestAdapter;
-
+//已通过
 public class TupleDescTest extends SimpleDbTestBase {
 
 

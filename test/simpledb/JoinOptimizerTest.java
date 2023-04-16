@@ -22,7 +22,7 @@ import simpledb.systemtest.SimpleDbTestBase;
 import simpledb.systemtest.SystemTestUtil;
 import simpledb.transaction.TransactionAbortedException;
 import simpledb.transaction.TransactionId;
-
+//已通过
 public class JoinOptimizerTest extends SimpleDbTestBase {
 
     /**

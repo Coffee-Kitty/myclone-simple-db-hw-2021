@@ -11,13 +11,15 @@ import simpledb.storage.*;
 import simpledb.transaction.TransactionId;
 
 import java.util.Iterator;
-
+//已通过
 public class TransactionTest extends TestUtil.CreateHeapFile {
   private PageId p0, p1, p2;
   private TransactionId tid1, tid2;
 
   // just so we have a pointer shorter than Database.getBufferPool()
   private BufferPool bp;
+
+
 
   /**
    * Set up initial resources for each unit test.

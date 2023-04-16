@@ -15,7 +15,7 @@ import simpledb.storage.IntField;
 import simpledb.storage.Tuple;
 import simpledb.transaction.TransactionAbortedException;
 import simpledb.transaction.TransactionId;
-
+//已通过
 public class InsertTest extends SimpleDbTestBase {
     private void validateInsert(int columns, int sourceRows, int destinationRows)
                 throws DbException, IOException, TransactionAbortedException {

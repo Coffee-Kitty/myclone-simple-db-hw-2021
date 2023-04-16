@@ -17,7 +17,7 @@ import simpledb.storage.HeapFile;
 import simpledb.storage.IntField;
 import simpledb.transaction.TransactionAbortedException;
 import simpledb.transaction.TransactionId;
-
+//已通过
 public abstract class FilterBase extends SimpleDbTestBase {
     private static final int COLUMNS = 3;
     private static final int ROWS = 1097;

@@ -14,7 +14,7 @@ import simpledb.execution.Aggregator;
 import simpledb.execution.IntegerAggregator;
 import simpledb.execution.OpIterator;
 import simpledb.systemtest.SimpleDbTestBase;
-
+//已通过
 public class IntegerAggregatorTest extends SimpleDbTestBase {
 
   final int width1 = 2;

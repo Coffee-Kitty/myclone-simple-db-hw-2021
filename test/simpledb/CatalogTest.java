@@ -18,7 +18,7 @@ import simpledb.storage.DbFile;
 import simpledb.storage.TupleDesc;
 import simpledb.systemtest.SimpleDbTestBase;
 import simpledb.systemtest.SystemTestUtil;
-
+//已通过
 public class CatalogTest extends SimpleDbTestBase {
 	private static final Random r = new Random();
     private static final String name = SystemTestUtil.getUUID();

@@ -16,7 +16,7 @@ import simpledb.execution.Predicate;
 import simpledb.storage.Tuple;
 import simpledb.storage.TupleDesc;
 import simpledb.systemtest.SimpleDbTestBase;
-
+//已通过
 public class JoinTest extends SimpleDbTestBase {
 
   final int width1 = 2;

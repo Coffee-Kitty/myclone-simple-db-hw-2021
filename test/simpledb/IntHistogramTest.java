@@ -5,7 +5,7 @@ import org.junit.Assert;
 
 import simpledb.execution.Predicate.Op;
 import simpledb.optimizer.IntHistogram;
-
+//已通过
 public class IntHistogramTest {
 
 	/**

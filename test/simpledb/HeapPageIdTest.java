@@ -10,7 +10,7 @@ import simpledb.systemtest.SimpleDbTestBase;
 
 import static org.junit.Assert.*;
 
-
+//已通过
 
 public class HeapPageIdTest extends SimpleDbTestBase {
 

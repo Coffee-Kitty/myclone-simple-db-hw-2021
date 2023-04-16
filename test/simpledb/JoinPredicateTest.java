@@ -9,7 +9,7 @@ import simpledb.systemtest.SimpleDbTestBase;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
 import junit.framework.JUnit4TestAdapter;
-
+//已通过
 public class JoinPredicateTest extends SimpleDbTestBase {
 
   /**

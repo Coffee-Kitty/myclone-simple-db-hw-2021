@@ -25,6 +25,7 @@ import simpledb.transaction.TransactionId;
  * args[1] is the number of columns.  E.g., if it's 5, then ScanTest will end
  * up dumping the contents of f4.0.txt.
  */
+//已通过
 public class ScanTest extends SimpleDbTestBase {
     private final static Random r = new Random();
 

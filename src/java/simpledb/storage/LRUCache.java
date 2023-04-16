@@ -42,6 +42,7 @@ public class LRUCache<K,V> {
     }
 
     //hashMap k为key 值为linkNode
+    //既然这里用了 key作为hash 则一定要注意key是否重写了hashcode equals
     private Map<K,DLinkNode> cache=new ConcurrentHashMap<K, DLinkNode>();
     private int size;
     private int capacity;
@@ -102,11 +103,13 @@ public class LRUCache<K,V> {
         node.pre = head;
         head.next = node;
     }
+
     //删除一个节点  内部使用
     private void remove(K key,DLinkNode node){
         node.next.pre = node.pre;
         node.pre.next = node.next;
 
+        size--;
         cache.remove(key);
     }
     //提供一个删除K 的公有方法
@@ -132,11 +135,14 @@ public class LRUCache<K,V> {
         size++;
         //注意添加到 cache
         cache.put(key,dLinkNode);
-        //需要查看是否超出容量
-        if(size>=capacity){
-            //移除队尾  即最近最久未使用
-            removeTail();
-        }
+
+//        //存在问题  如果事务未提交  怎么可以丢弃呢 而且如果还是脏页  怎么没有刷盘呢？
+        //交给外面来做吧
+//        //需要查看是否超出容量
+//        if(size>capacity){
+//            //移除队尾  即最近最久未使用
+//            removeTail();
+//        }
     }
     private void addToHead(DLinkNode node) {
         node.pre = head;
@@ -170,7 +176,5 @@ public class LRUCache<K,V> {
     public V getTailV(){
         return tail.value;//并未调整顺序
     }
-
-
 
 }

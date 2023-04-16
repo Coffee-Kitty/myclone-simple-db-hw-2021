@@ -16,8 +16,10 @@ import simpledb.storage.IntField;
 import simpledb.storage.Tuple;
 import simpledb.transaction.TransactionAbortedException;
 import simpledb.transaction.TransactionId;
+//已通过
+public class
 
-public class DeleteTest extends FilterBase {
+DeleteTest extends FilterBase {
     List<List<Integer>> expectedTuples = null;
 
 

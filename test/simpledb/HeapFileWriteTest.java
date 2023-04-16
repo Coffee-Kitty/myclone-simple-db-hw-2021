@@ -14,7 +14,7 @@ import simpledb.transaction.TransactionId;
 
 import java.util.Arrays;
 
-
+//已通过
 
 public class HeapFileWriteTest extends TestUtil.CreateHeapFile {
     private TransactionId tid;
